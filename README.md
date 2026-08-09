@@ -22,7 +22,7 @@ the same field data that powers PageSpeed Insights and Google Search's CWV signa
    ```bash
    claude mcp add google-crux \
      -e CRUX_API_KEY=your_key \
-     -- npx -y mcp-google-crux
+     -- npx -y mcp-google-crux@latest
    ```
 
 3. Ask the assistant: "Does https://web.dev pass Core Web Vitals on mobile?"
@@ -67,7 +67,7 @@ threshold the API answers "no data", which the tools report as `no_data`, not an
 ```bash
 claude mcp add google-crux \
   -e CRUX_API_KEY=your_key \
-  -- npx -y mcp-google-crux
+  -- npx -y mcp-google-crux@latest
 ```
 
 </details>
@@ -82,7 +82,7 @@ claude mcp add google-crux \
   "mcpServers": {
     "google-crux": {
       "command": "npx",
-      "args": ["-y", "mcp-google-crux"],
+      "args": ["-y", "mcp-google-crux@latest"],
       "env": { "CRUX_API_KEY": "your_key" }
     }
   }
@@ -101,7 +101,7 @@ claude mcp add google-crux \
   "mcpServers": {
     "google-crux": {
       "command": "npx",
-      "args": ["-y", "mcp-google-crux"],
+      "args": ["-y", "mcp-google-crux@latest"],
       "env": { "CRUX_API_KEY": "your_key" }
     }
   }
@@ -121,7 +121,7 @@ claude mcp add google-crux \
     "google-crux": {
       "type": "stdio",
       "command": "npx",
-      "args": ["-y", "mcp-google-crux"],
+      "args": ["-y", "mcp-google-crux@latest"],
       "env": { "CRUX_API_KEY": "your_key" }
     }
   }
