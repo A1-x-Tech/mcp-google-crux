@@ -1,0 +1,49 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.A1-x-Tech/mcp-google-crux",
+  "title": "Google CrUX MCP",
+  "description": "Real-user Core Web Vitals from the Chrome UX Report (CrUX) API for any origin or URL.",
+  "websiteUrl": "https://github.com/A1-x-Tech/mcp-google-crux#readme",
+  "repository": {
+    "url": "https://github.com/A1-x-Tech/mcp-google-crux",
+    "source": "github"
+  },
+  "version": "0.1.0",
+  "packages": [
+    {
+      "registryType": "npm",
+      "registryBaseUrl": "https://registry.npmjs.org",
+      "identifier": "mcp-google-crux",
+      "version": "0.1.0",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "CRUX_API_KEY",
+          "description": "Google Cloud API key with the Chrome UX Report API enabled (sent as the key= query parameter). Treat it as a secret.",
+          "isRequired": true,
+          "isSecret": true
+        },
+        {
+          "name": "CRUX_API_BASE",
+          "description": "API root host override.",
+          "isRequired": false,
+          "default": "https://chromeuxreport.googleapis.com"
+        },
+        {
+          "name": "CRUX_TIMEOUT_MS",
+          "description": "Per-request timeout in milliseconds.",
+          "isRequired": false,
+          "default": "30000"
+        },
+        {
+          "name": "CRUX_MAX_RETRIES",
+          "description": "Retries on transient errors (429, 5xx, network).",
+          "isRequired": false,
+          "default": "3"
+        }
+      ]
+    }
+  ]
+}
