@@ -1,0 +1,23 @@
+{
+  "name": "mcp-google-crux",
+  "version": "0.0.1",
+  "description": "MCP server for the Chrome UX Report (CrUX) API — real-user Core Web Vitals (LCP, INP, CLS, TTFB) and 40-week history for any origin or URL. For Claude, Cursor, Codex and other AI clients.",
+  "keywords": ["mcp", "model-context-protocol", "crux", "chrome-ux-report", "core-web-vitals", "web-vitals", "performance", "claude", "cursor", "codex"],
+  "homepage": "https://github.com/A1-x-Tech/mcp-google-crux#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/A1-x-Tech/mcp-google-crux.git"
+  },
+  "license": "MIT",
+  "author": "gistrec <gistrec@gmail.com>",
+  "type": "module",
+  "bin": {
+    "mcp-google-crux": "index.js"
+  },
+  "files": [
+    "index.js"
+  ],
+  "engines": {
+    "node": ">=18"
+  }
+}
