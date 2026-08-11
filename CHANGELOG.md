@@ -7,6 +7,13 @@ and the project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.0.0] — 2026-08-11
+
+### Changed
+
+- Declared stable. The tool surface, input schemas and environment variables of 0.1.x carry over
+  unchanged — this release marks API stability, not new behaviour.
+
 ## [0.1.0] — 2026-08-09
 
 ### Added
@@ -45,6 +52,7 @@ and the project adheres to [Semantic Versioning](https://semver.org/).
 
 - Package stub to reserve the npm name.
 
-[Unreleased]: https://github.com/A1-x-Tech/mcp-google-crux/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/A1-x-Tech/mcp-google-crux/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/A1-x-Tech/mcp-google-crux/releases/tag/v1.0.0
 [0.1.0]: https://github.com/A1-x-Tech/mcp-google-crux/releases/tag/v0.1.0
 [0.0.1]: https://github.com/A1-x-Tech/mcp-google-crux/commits/7eb0858
