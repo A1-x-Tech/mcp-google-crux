@@ -34,6 +34,12 @@ test("dist binary completes the MCP handshake over stdio and reports its identit
     const info = client.getServerVersion();
     assert.equal(info?.name, "mcp-google-crux");
     assert.equal(info?.version, PKG.version, "server must report the real package version");
+
+    // The initialize result also carries the prose the calling model reads
+    // before it picks a tool — an empty one would ship the server unbriefed.
+    const instructions = client.getInstructions();
+    assert.equal(typeof instructions, "string", "initialize result must carry instructions");
+    assert.ok(instructions.trim().length > 0, "instructions must not be empty");
   } finally {
     await client.close();
   }

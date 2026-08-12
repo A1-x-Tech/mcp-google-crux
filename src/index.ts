@@ -9,6 +9,27 @@ import type { CruxConfig } from "./types.js";
 import { registerVitalsTools } from "./tools/vitals.js";
 import { registerRecordTools } from "./tools/records.js";
 
+/**
+ * Prose the calling model receives in the `initialize` result, before it picks a
+ * tool — the only place to say what the tool list cannot: which dataset this is
+ * (field, not lab), where the API stops, what a call costs against the shared
+ * quota and which answers mean something other than they say. English, like the
+ * tool descriptions.
+ */
+const INSTRUCTIONS =
+  "The Chrome UX Report (CrUX) API serves aggregated real-user field data from Chrome for any " +
+  "public origin or page — no ownership or verification needed, but nothing on private or " +
+  "low-traffic pages. It is the field data behind PageSpeed Insights, not a lab tool: nothing is " +
+  "measured on demand and there is no optimization advice. Read-only; a request carries only origin " +
+  "XOR url, a device class, a metric list and — for history — a week count: no geography, audience " +
+  "or arbitrary date range. Data is a 28-day rolling window refreshed daily (~04:00 UTC; history on " +
+  "Mondays): the same query returns identical numbers all day — do not poll. Quota: 150 " +
+  "requests/min per Cloud project, free, shared by both endpoints, no paid upgrade; " +
+  "compare_form_factors spends 4 units and compare_origin_vs_url 2, so avoid looping over many " +
+  "URLs. {no_data: true} (HTTP 404) means too little traffic, not a bad request: drop form_factor " +
+  "or fall back from url to origin. A permission error is about the key, not the query: its project " +
+  "must have the Chrome UX Report API enabled, and key restrictions must allow it.";
+
 /** Reads the package version so the server reports its real version to MCP clients. */
 function readVersion(): string {
   try {
@@ -44,10 +65,14 @@ async function main(): Promise<void> {
   const config = await loadConfigOrExit(telemetry);
   const client = new CruxClient(config);
 
-  const server = new McpServer({
-    name: "mcp-google-crux",
-    version: readVersion(),
-  });
+  const server = new McpServer(
+    {
+      name: "mcp-google-crux",
+      version: readVersion(),
+    },
+    // Surfaces as `instructions` in the initialize result (ServerOptions, not serverInfo).
+    { instructions: INSTRUCTIONS },
+  );
 
   instrumentToolCalls(server, telemetry);
   server.server.oninitialized = () => {
