@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { CruxClient } from "./client.js";
 import type { CruxConfig } from "./types.js";
-import { CruxError, CruxNoDataError } from "./types.js";
+import { CredentialsError, CruxError, CruxNoDataError } from "./types.js";
 
 const BASE = "https://chromeuxreport.googleapis.com";
 
@@ -246,6 +246,40 @@ test("a hung request aborts with a timeout message that never contains the key",
     );
   } finally {
     globalThis.fetch = original;
+  }
+});
+
+// --- Missing credentials (degraded start) ---
+
+// The exact startup-era text, relayed verbatim at call time — pinned so a
+// reworded message does not silently change what the model tells the user.
+const MISSING_KEY_TEXT =
+  "CRUX_API_KEY is required (a Google Cloud API key with the Chrome UX Report API enabled; " +
+  "create one at https://console.cloud.google.com/apis/credentials).";
+
+test("request() without an api key throws CredentialsError; fetch is never called", async () => {
+  const mock = mockFetch(() => new Response("{}", { status: 200 }));
+  try {
+    const client = new CruxClient({ apiBase: BASE, retryBaseMs: 0 });
+    await assert.rejects(
+      () => client.queryRecord({ origin: "https://example.com" }),
+      (err: unknown) => {
+        assert.ok(err instanceof CredentialsError, "must be a CredentialsError");
+        assert.equal((err as Error).name, "CredentialsError");
+        const message = (err as Error).message;
+        assert.ok(
+          message.includes(MISSING_KEY_TEXT),
+          `message must carry the exact startup text, got: ${message}`,
+        );
+        assert.match(message, /restart the server/);
+        return true;
+      },
+    );
+    // Not transport trouble: the retry/backoff loop — and fetch itself —
+    // must never run for a configuration problem.
+    assert.equal(mock.calls.length, 0, "fetch must not be called without credentials");
+  } finally {
+    mock.restore();
   }
 });
 

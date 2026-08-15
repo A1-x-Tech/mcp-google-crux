@@ -9,8 +9,12 @@
 export type FormFactor = "phone" | "desktop" | "tablet";
 
 export interface CruxConfig {
-  /** Google Cloud API key (Chrome UX Report API enabled). Treated as a secret. */
-  apiKey: string;
+  /**
+   * Google Cloud API key (Chrome UX Report API enabled). Treated as a secret.
+   * Absent when CRUX_API_KEY is not set — the server still starts (degraded)
+   * and the client raises {@link CredentialsError} at call time.
+   */
+  apiKey?: string;
   /** API root host. Defaults to https://chromeuxreport.googleapis.com. */
   apiBase: string;
   /** Per-request timeout in milliseconds. Defaults to 30_000. */
@@ -71,6 +75,21 @@ export interface CruxResponse {
   record?: CruxRecord;
   /** Present only if the API normalized the queried URL (e.g. stripped a fragment). */
   urlNormalizationDetails?: { originalUrl?: string; normalizedUrl?: string };
+}
+
+/**
+ * Raised when a tool is called while CRUX_API_KEY is missing. The message is
+ * the whole point of the class: it is the only text the calling model reads
+ * and relays, so it names the variable to set (and that the server needs a
+ * restart) instead of describing the failure. The client throws it before the
+ * URL is built — a missing key is a configuration problem, not transport
+ * trouble, so it must never enter the retry/backoff loop or reach fetch.
+ */
+export class CredentialsError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "CredentialsError";
+  }
 }
 
 /**

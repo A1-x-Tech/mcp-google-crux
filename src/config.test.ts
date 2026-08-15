@@ -1,12 +1,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
-import { ConfigError, loadConfig } from "./config.js";
+import { loadConfig } from "./config.js";
 
-/**
- * The reason codes below are the vocabulary the telemetry dashboard groups by —
- * renaming one silently splits a bar in two, so they are pinned here.
- */
 function withEnv(vars: Record<string, string | undefined>, run: () => void): void {
   const saved = new Map(Object.keys(vars).map((k) => [k, process.env[k]]));
   for (const [k, v] of Object.entries(vars)) {
@@ -23,17 +19,25 @@ function withEnv(vars: Record<string, string | undefined>, run: () => void): voi
   }
 }
 
-test("a missing api key reports missing_api_key", () => {
-  let caught: unknown;
-  withEnv({ CRUX_API_KEY: undefined }, () => {
-    try {
-      loadConfig();
-    } catch (err) {
-      caught = err;
-    }
+/**
+ * A missing CRUX_API_KEY used to throw, which killed the process before the
+ * MCP handshake and left the user with a dead server and no reason. It is now
+ * a survivable state: the server starts, answers initialize/tools/list, and
+ * the client raises CredentialsError at call time (pinned in client.test.ts).
+ * Pinned here because reverting it would restore that dead end.
+ */
+test("a missing api key does not throw — the server must start degraded", () => {
+  withEnv({ CRUX_API_KEY: undefined, CRUX_API_BASE: undefined }, () => {
+    const config = loadConfig();
+    assert.equal(config.apiKey, undefined);
+    assert.equal(config.apiBase, "https://chromeuxreport.googleapis.com");
   });
-  assert.ok(caught instanceof ConfigError, "config problems must throw ConfigError, not exit");
-  assert.equal(caught.reason, "missing_api_key");
+});
+
+test("an empty value is treated as absent, not as an empty credential", () => {
+  withEnv({ CRUX_API_KEY: "" }, () => {
+    assert.equal(loadConfig().apiKey, undefined);
+  });
 });
 
 test("a configured server loads with sane defaults", () => {
