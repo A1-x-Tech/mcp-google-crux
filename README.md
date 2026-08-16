@@ -162,3 +162,13 @@ The key is stored in the MCP client configuration and is sent in the API request
 ## Support
 
 Found a bug or need a scenario? [Create an issue](https://github.com/A1-x-Tech/mcp-google-crux/issues) or write in [Telegram](https://t.me/a1_mcp).
+
+<br>
+
+<p align="center">
+  <img src="https://github.com/ztemerbekov/a1-yandex-kit-skills/raw/main/assets/images/mona-hifive-yandex-kit-warm.gif" alt="Две Моны дают пять" width="256">
+</p>
+
+<p align="center">
+  Вы дочитали до конца!
+</p>
