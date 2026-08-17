@@ -70,6 +70,8 @@ npm run smoke      # live READ-ONLY call (needs CRUX_API_KEY)
 
 ## Adding a tool
 
+Before changing the tool registry, read [the MCP capability documentation contract](docs/CAPABILITY-DOCUMENTATION.md). Every registered tool must have exactly one task-oriented page in `docs/capabilities/`; update that page, the index, and the coverage test in the same change.
+
 1. Add (or extend) `src/tools/<name>.ts` with `register<Name>Tools(server, client)`.
 2. Pure computation goes to `src/cwv.ts`; new endpoints (unlikely — there are only two)
    go to `src/client.ts`.

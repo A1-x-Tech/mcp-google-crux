@@ -1,5 +1,7 @@
 # Tools
 
+For task-oriented guidance, open the [MCP capability catalog](./capabilities/index.md). This page remains the technical reference for schemas and API responses.
+
 All tools are read-only — the Chrome UX Report API has no write endpoints. Inputs
 are normalized (`phone|desktop|tablet`, snake_case fields); the client maps them to
 the API's wire values (`PHONE|DESKTOP|TABLET`, camelCase body fields) and injects
