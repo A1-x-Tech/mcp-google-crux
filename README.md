@@ -154,6 +154,7 @@ The key is stored in the MCP client configuration and is sent in the API request
 
 ## Technical documentation
 
+- [MCP capability catalog](./docs/capabilities/index.md) — task-oriented pages for every tool.
 - [All tools and inputs](./docs/TOOLS.md)
 - [Development documentation](./docs/DEVELOPMENT.md)
 - [Publishing documentation](./docs/PUBLISHING.md)
