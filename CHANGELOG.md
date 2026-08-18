@@ -5,7 +5,7 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and the project adheres to [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
+## [1.1.0] — 2026-08-19
 
 ### Changed
 
@@ -75,7 +75,8 @@ and the project adheres to [Semantic Versioning](https://semver.org/).
 
 - Package stub to reserve the npm name.
 
-[Unreleased]: https://github.com/A1-x-Tech/mcp-google-crux/compare/v1.0.1...HEAD
+[Unreleased]: https://github.com/A1-x-Tech/mcp-google-crux/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/A1-x-Tech/mcp-google-crux/releases/tag/v1.1.0
 [1.0.1]: https://github.com/A1-x-Tech/mcp-google-crux/releases/tag/v1.0.1
 [1.0.0]: https://github.com/A1-x-Tech/mcp-google-crux/releases/tag/v1.0.0
 [0.1.0]: https://github.com/A1-x-Tech/mcp-google-crux/releases/tag/v0.1.0
