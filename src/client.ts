@@ -1,5 +1,19 @@
 import type { CruxConfig, CruxResponse, FormFactor } from "./types.js";
-import { CruxError, CruxNoDataError } from "./types.js";
+import { CredentialsError, CruxError, CruxNoDataError } from "./types.js";
+
+/**
+ * Call-time text for a missing API key — formerly the startup error that
+ * killed the process before the MCP handshake, preserved verbatim (pinned in
+ * client.test.ts). The message is the product: it is what the calling model
+ * relays to the user, so it names the variable to set and says the server
+ * needs a restart — there is no in-chat login for an API key.
+ */
+const MISSING_API_KEY_MESSAGE =
+  "CRUX_API_KEY is required (a Google Cloud API key with the Chrome UX Report API enabled; " +
+  "create one at https://console.cloud.google.com/apis/credentials)." +
+  " This is not a network failure and retrying will not help: the operator must set this " +
+  "environment variable in the MCP client's server config and restart the server — it is " +
+  "read only at startup.";
 
 /** Normalized inputs shared by both endpoints. Exactly one of origin/url. */
 export interface QueryRecordParams {
@@ -73,19 +87,27 @@ export class CruxClient {
   /**
    * Low-level request to a CrUX path (e.g. "v1/records:queryRecord"). The API
    * is POST-only (GET answers with a misleading 404), so the method is fixed.
+   * A missing API key throws {@link CredentialsError} before anything else.
    * The API key rides as the `key` query parameter and never appears in error
    * messages. Retries 429, 5xx and network errors/timeouts with backoff; 404
    * throws {@link CruxNoDataError} ("no data", a normal outcome); any other
    * non-2xx throws a {@link CruxError}.
    */
   async request<T = unknown>(path: string, body: Record<string, unknown>): Promise<T> {
+    // A missing API key is rejected before the URL is built, the request sent
+    // or retried: it is a configuration problem, not transport trouble, so it
+    // must never enter the retry/backoff loop below — and fetch never fires
+    // without auth (pinned in client.test.ts).
+    const apiKey = this.config.apiKey;
+    if (!apiKey) throw new CredentialsError(MISSING_API_KEY_MESSAGE);
+
     // Resolve the path against the API base, then reject anything that escaped
     // to a foreign origin so the API key can never ride to another host.
     const url = new URL(path.replace(/^\//, ""), this.base);
     if (url.origin !== new URL(this.base).origin) {
       throw new Error(`path must be a relative API path (resolved to foreign origin ${url.origin})`);
     }
-    url.searchParams.set("key", this.config.apiKey);
+    url.searchParams.set("key", apiKey);
     const target = url.toString();
 
     // The CrUX API is read-only — both endpoints are side-effect-free POSTs,

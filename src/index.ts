@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { CruxClient } from "./client.js";
-import { ConfigError, loadConfig } from "./config.js";
+import { ConfigError, DEFAULT_BASE, loadConfig } from "./config.js";
 import { instrumentToolCalls, Telemetry } from "./telemetry.js";
 import type { CruxConfig } from "./types.js";
 import { registerVitalsTools } from "./tools/vitals.js";
@@ -30,6 +30,19 @@ const INSTRUCTIONS =
   "or fall back from url to origin. A permission error is about the key, not the query: its project " +
   "must have the Chrome UX Report API enabled, and key restrictions must allow it.";
 
+/**
+ * Prepended to INSTRUCTIONS when no API key is configured. The model reads
+ * this before it picks a tool, so an unconfigured session opens with the fix
+ * rather than with a failed call. There is no in-chat login: the key comes
+ * only from the environment, so the fix is an operator action + restart.
+ */
+const UNCONFIGURED_PREFIX =
+  "ATTENTION: the Chrome UX Report server is not connected yet — CRUX_API_KEY is not set, so " +
+  "every tool call will fail. The operator must set CRUX_API_KEY (a free Google Cloud API key " +
+  "with the Chrome UX Report API enabled; create one at " +
+  "https://console.cloud.google.com/apis/credentials) in the MCP client's server config and " +
+  "restart this server — the variable is read only at startup. ";
+
 /** Reads the package version so the server reports its real version to MCP clients. */
 function readVersion(): string {
   try {
@@ -41,29 +54,44 @@ function readVersion(): string {
 }
 
 /**
- * Loads the config, reporting the drop-off if it is missing. An unconfigured
- * server dies before the MCP handshake, so this ping is the only trace such an
- * install ever leaves — and it has to be awaited, or process.exit() below would
- * kill the request in flight.
+ * Loads the config without dying on a bad value. A server that exits here never
+ * completes the MCP handshake, so the user sees a dead server and no reason —
+ * instead the problem is carried into the session, where the model can read it
+ * and relay it. (A missing CRUX_API_KEY is not an error at all — loadConfig
+ * leaves the field undefined; today it has no malformed-value checks either,
+ * so the catch guards future ones.)
  */
-async function loadConfigOrExit(telemetry: Telemetry): Promise<CruxConfig> {
+function loadConfigOrDegraded(telemetry: Telemetry): {
+  config: CruxConfig;
+  problem?: ConfigError;
+} {
   try {
-    return loadConfig();
+    return { config: loadConfig() };
   } catch (err) {
     if (!(err instanceof ConfigError)) throw err;
     console.error(`Error: ${err.message}`);
-    await telemetry.sendBlocking("startup_failed", { reason: err.reason });
-    process.exit(1);
+    // Fire-and-forget now that the process survives: the historical
+    // `startup_failed` funnel stays comparable, but nothing blocks startup.
+    telemetry.send("startup_failed", { reason: err.reason });
+    return {
+      config: { apiBase: process.env.CRUX_API_BASE || DEFAULT_BASE },
+      problem: err,
+    };
   }
 }
 
 async function main(): Promise<void> {
   // Anonymous usage pings (ids/names/versions only, never data or arguments);
-  // opt out with ASKADS_TELEMETRY=0. Built before the config so a missing key
-  // can be reported; wired to the server before tools register.
+  // opt out with ASKADS_TELEMETRY=0. Built before the config so a config
+  // problem can be reported; wired to the server before tools register.
   const telemetry = new Telemetry(readVersion());
-  const config = await loadConfigOrExit(telemetry);
+  const { config, problem } = loadConfigOrDegraded(telemetry);
   const client = new CruxClient(config);
+
+  // Decided once, at startup: the key comes only from the environment, so an
+  // unconfigured start stays unconfigured until the operator sets the variable
+  // and restarts the server — "restart" is the accurate advice to give.
+  const connected = Boolean(config.apiKey);
 
   const server = new McpServer(
     {
@@ -71,13 +99,21 @@ async function main(): Promise<void> {
       version: readVersion(),
     },
     // Surfaces as `instructions` in the initialize result (ServerOptions, not serverInfo).
-    { instructions: INSTRUCTIONS },
+    {
+      instructions: connected
+        ? INSTRUCTIONS
+        : UNCONFIGURED_PREFIX + (problem ? `Configuration problem: ${problem.message} ` : "") + INSTRUCTIONS,
+    },
   );
 
   instrumentToolCalls(server, telemetry);
   server.server.oninitialized = () => {
     telemetry.setClientInfo(server.server.getClientVersion());
-    telemetry.send("server_start");
+    // Split on purpose: `server_start` keeps meaning "a usable install started",
+    // so the unconfigured case gets its own event instead of inflating that
+    // number. The reason vocabulary is the historical closed set.
+    if (connected) telemetry.send("server_start");
+    else telemetry.send("unconfigured_start", { reason: problem?.reason ?? "missing_api_key" });
   };
 
   registerVitalsTools(server, client);
@@ -85,7 +121,9 @@ async function main(): Promise<void> {
 
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  console.error("mcp-google-crux running on stdio");
+  console.error(
+    `mcp-google-crux running on stdio${connected ? "" : " (no CRUX_API_KEY — set the environment variable and restart)"}`,
+  );
 }
 
 main().catch((err) => {

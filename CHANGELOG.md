@@ -7,6 +7,20 @@ and the project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+
+- The server no longer exits when `CRUX_API_KEY` is missing: it starts, answers `initialize`
+  and `tools/list`, and the initialize `instructions` warn the model that the operator must
+  set the environment variable and restart the server. The historical startup error
+  ("CRUX_API_KEY is required…") is preserved verbatim and now returned on every tool call
+  (`CredentialsError`, an `isError` result) — without retries and without touching the
+  network. Previously the process died before the MCP handshake, leaving the user a dead
+  server with no reason.
+- Telemetry: a surviving unconfigured start sends its own `unconfigured_start` event with the
+  historical reason code (`missing_api_key`); `server_start` now means a usable install
+  started. `startup_failed` remains for a config unusable at load time (malformed values) and
+  is now fire-and-forget — the process no longer waits for the ping before exiting.
+
 ## [1.0.1] — 2026-08-12
 
 ### Added
