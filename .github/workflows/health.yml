@@ -27,8 +27,8 @@ jobs:
       # through job env so the guard below can check it.
       CRUX_API_KEY: ${{ secrets.CRUX_API_KEY }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: 20.x
           cache: npm
