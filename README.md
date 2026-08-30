@@ -57,7 +57,7 @@ You need Node.js 20+ and a Google Cloud API key with Chrome UX Report API enable
 
 <br>
 
-In **Settings → Plugins → MCP servers**, select **Add server**, then add `npx -y mcp-google-crux@latest` with `CRUX_API_KEY`.
+In **Settings → MCP servers**, select **Add server**, choose **STDIO**, enter the command `npx -y mcp-google-crux@latest` and environment variables `CRUX_API_KEY`, then select **Save** and **Restart**.
 
 ```bash
 codex mcp add google-crux --env CRUX_API_KEY=your_key -- npx -y mcp-google-crux@latest
@@ -85,9 +85,15 @@ claude mcp list
 
 <br>
 
-Open **Settings → Developer → Edit Config** and add `{"mcpServers":{"google-crux":{"command":"npx","args":["-y","mcp-google-crux@latest"],"env":{"CRUX_API_KEY":"your_key"}}}}`.
+The current official path is **Settings → Extensions**. For a custom desktop extension, open **Advanced settings → Extension Developer → Install Extension…**, select a `.mcpb` file and follow the prompts.
 
-If **Edit Config** is unavailable, edit `~/Library/Application Support/Claude/claude_desktop_config.json` on macOS or `%APPDATA%\Claude\claude_desktop_config.json` on Windows. [Claude Desktop MCP documentation](https://support.claude.com/en/articles/10949351-getting-started-with-local-mcp-servers-on-claude-desktop)
+This repository currently publishes an npm stdio package and does not contain a `.mcpb` bundle. For Claude Desktop builds that still support local configuration, use the following JSON stdio configuration as a fallback:
+
+`{"mcpServers":{"google-crux":{"command":"npx","args":["-y","mcp-google-crux@latest"],"env":{"CRUX_API_KEY":"your_key"}}}}`
+
+In those builds, save it to `~/Library/Application Support/Claude/claude_desktop_config.json` on macOS or `%APPDATA%\Claude\claude_desktop_config.json` on Windows.
+
+[Claude Desktop MCP documentation](https://support.claude.com/en/articles/10949351-getting-started-with-local-mcp-servers-on-claude-desktop)
 
 </details>
 

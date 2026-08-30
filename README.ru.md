@@ -57,7 +57,7 @@
 
 <br>
 
-В **Settings → Plugins → MCP servers** выберите **Add server**, затем добавьте `npx -y mcp-google-crux@latest` с `CRUX_API_KEY`.
+В **Settings → MCP servers** нажмите **Add server**, выберите **STDIO**, укажите команду `npx -y mcp-google-crux@latest` и переменные окружения `CRUX_API_KEY`, затем нажмите **Save**, потом **Restart**.
 
 ```bash
 codex mcp add google-crux --env CRUX_API_KEY=your_key -- npx -y mcp-google-crux@latest
@@ -85,9 +85,15 @@ claude mcp list
 
 <br>
 
-Откройте **Settings → Developer → Edit Config** и добавьте `{"mcpServers":{"google-crux":{"command":"npx","args":["-y","mcp-google-crux@latest"],"env":{"CRUX_API_KEY":"your_key"}}}}`.
+Актуальный официальный путь — **Settings → Extensions**. Для пользовательского desktop extension откройте **Advanced settings → Extension Developer → Install Extension…**, выберите файл `.mcpb` и следуйте подсказкам.
 
-Если **Edit Config** недоступна, отредактируйте `~/Library/Application Support/Claude/claude_desktop_config.json` на macOS или `%APPDATA%\Claude\claude_desktop_config.json` на Windows. [Документация Claude Desktop MCP](https://support.claude.com/en/articles/10949351-getting-started-with-local-mcp-servers-on-claude-desktop)
+Этот репозиторий сейчас публикует npm-пакет со stdio и пока не содержит `.mcpb`. Поэтому используйте приведённый ниже JSON stdio-конфиг как fallback только в сборках Claude Desktop, где ещё поддерживается локальная конфигурация:
+
+`{"mcpServers":{"google-crux":{"command":"npx","args":["-y","mcp-google-crux@latest"],"env":{"CRUX_API_KEY":"your_key"}}}}`
+
+В таких сборках сохраните его в `~/Library/Application Support/Claude/claude_desktop_config.json` на macOS или `%APPDATA%\Claude\claude_desktop_config.json` на Windows.
+
+[Документация Claude Desktop MCP](https://support.claude.com/en/articles/10949351-getting-started-with-local-mcp-servers-on-claude-desktop)
 
 </details>
 
