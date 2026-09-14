@@ -3,8 +3,8 @@
 **English** | [Русский](./README.ru.md)
 
 [![npm](https://img.shields.io/npm/v/mcp-google-crux)](https://www.npmjs.com/package/mcp-google-crux)
-[![CI](https://github.com/A1-x-Tech/mcp-google-crux/actions/workflows/ci.yml/badge.svg)](https://github.com/A1-x-Tech/mcp-google-crux/actions/workflows/ci.yml)
 [![Glama](https://glama.ai/mcp/servers/A1-x-Tech/mcp-google-crux/badges/score.svg)](https://glama.ai/mcp/servers/A1-x-Tech/mcp-google-crux)
+[![CI](https://github.com/A1-x-Tech/mcp-google-crux/actions/workflows/ci.yml/badge.svg)](https://github.com/A1-x-Tech/mcp-google-crux/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 
 **A1 Google CrUX MCP** brings real-user Core Web Vitals data into an AI app. Check whether a public site or page passes LCP, INP and CLS, compare mobile with desktop, and see how the metrics changed over time.
