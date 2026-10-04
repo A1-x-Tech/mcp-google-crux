@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "google-crux": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-google-crux@latest"
+      ],
+      "env": {
+        "CRUX_API_KEY": "${CRUX_API_KEY}"
+      }
+    }
+  }
+}
