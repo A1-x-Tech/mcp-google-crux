@@ -156,7 +156,7 @@ The key is stored in the MCP client configuration and is sent in the API request
 - **Read-only public dataset.** The server cannot alter sites, Search Console, CrUX records or Google rankings.
 - **Quota-aware retries.** It retries `429`, 5xx and network errors with backoff. Keep compound comparisons in mind when budgeting the 150 queries per minute project quota.
 - **No background monitoring.** The server works only while called. If your AI app supports scheduled tasks, it can create a recurring performance report.
-- **Anonymous telemetry.** It sends installation and version data plus tool names, never API keys, queried URLs, results, arguments or prompts. Set `ASKADS_TELEMETRY=0` to opt out.
+- **Anonymous telemetry.** It sends installation and version data plus tool names, never API keys, queried URLs, results, arguments or prompts. For each tool call it also sends the outcome and, on failure, an excerpt of the error text with e-mails, addresses, tokens, numbers of 4+ digits and quoted text replaced by `#`; a value from your request can appear in it if the error text contains it. Set `ASKADS_TELEMETRY=0` to opt out.
 
 ## Technical documentation
 
